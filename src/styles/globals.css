@@ -311,17 +311,17 @@
     display: flex;
     position: relative;
 }
-.sort-box .active {
+.sort-box .current-status-sort {
     background-color: rgba(43,43,43,.8);
     color: #fff;
     border-radius: 5px;
     padding: 8px 12px;
     cursor: pointer;
 }
-.sort-box .active:hover {
+.sort-box .current-status-sort:hover {
     background-color: rgba(43,43,43,.75);
 }
-.sort-box .active i {
+.sort-box .current-status-sort i {
     margin-left: 10px;
     font-size: 14px;
 }
@@ -330,12 +330,14 @@
     text-align: center;
     position: absolute;
     top: 50px;
-    display: none;
     background-color: #242527de;
     color: #fff;
     padding: 10px;
     border-radius: 5px ;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 .sort-box__item {
     padding: 10px 10px;
@@ -345,10 +347,10 @@
     background-color: #66615a;
     border-radius: 5px;
 }
-.sort-box__options .active {
+/* .sort-box__options .active {
     background-color: #66615a;
     border-radius: 5px;
-}
+} */
 
 .gallery__content {
     padding: 0 80px;

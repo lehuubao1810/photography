@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Image from 'next/image';
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useState, useRef } from 'react';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -28,73 +28,88 @@ const reducer = (state, action) => {
             return state;
     }
 }
-const imgSrc = [
-    '/img/anni.jpg',
-    '/img/wed.jpg',
-    '/img/yb.jpg',
-    '/img/anni.jpg',
-    '/img/wed.jpg',
-    '/img/avt.jpg',
-    '/img/avt.jpg',
-    '/img/yb.jpg',
-]
+// const imgSrc = [
+//     '/img/anni.jpg',
+//     '/img/wed.jpg',
+//     '/img/yb.jpg',
+//     '/img/anni.jpg',
+//     '/img/wed.jpg',
+//     '/img/avt.jpg',
+//     '/img/avt.jpg',
+//     '/img/yb.jpg',
+// ]
+
+const imgSrc = {
+    wedding: [
+        {
+            src: '/img/wed.jpg',
+            catagory: 'wedding',
+            time: '2021-09-02'
+        },
+    ],
+    yearbook: [
+        {
+            src: '/img/yb.jpg',
+            catagory: 'yearbook',
+            time: '2021-09-01'
+        },
+    ],
+    anniversary: [
+        {
+            src: '/img/anni.jpg',
+            catagory: 'anniversary',
+            time: '2021-09-03'
+        },
+        
+    ],
+}
 
 function Gallery() {
 
-    // const [gallery, dispatch] = useReducer(reducer, initialState);
+    const [imgWed, setImgWed] = useState(imgSrc.wedding);
+    const [imgYb, setImgYb] = useState(imgSrc.yearbook);
+    const [imgAnni, setImgAnni] = useState(imgSrc.anniversary);
+    const [catagory, setCatagory] = useState('All');
 
-    // useEffect(() => {
-    //     for (let i = 0; i < imgSrc.length; i++) {
-    //         const column = i % 4;
-    //         switch (column) {
-    //             case 0:
-    //                 dispatch({
-    //                     type: 'ADD_COL1',
-    //                     payload: imgSrc[i]
-    //                 })
-    //                 break;
-    //             case 1:
-    //                 dispatch({
-    //                     type: 'ADD_COL2',
-    //                     payload: imgSrc[i]
-    //                 })
-    //                 break;
-    //             case 2:
-    //                 dispatch({
-    //                     type: 'ADD_COL3',
-    //                     payload: imgSrc[i]
-    //                 })
-    //                 break;
-    //             case 3:
-    //                 dispatch({
-    //                     type: 'ADD_COL4',
-    //                     payload: imgSrc[i]
-    //                 })
-    //                 break;
-    //             default:
-    //                 break;
-    //       }
-    //     }
-    // }, [])   
+    const [statusSortBox, setStatusSortBox] = useState(false);
+    const [currentSort, setCurrentSort] = useState('Newest');
 
     const [gallery, dispatch] = useReducer(reducer, initialState);
 
+    // const [imgArr, setImgArr] = useState([]);
+    // const imgWedRef = useRef(imgSrc.wedding);
+    // const imgYbRef = useRef(imgSrc.yearbook);
+    // const imgAnniRef = useRef(imgSrc.anniversary);
+    const imgAllRef = useRef([]);
+
     useEffect(() => {
+        const newImgAll = [...imgWed, ...imgYb, ...imgAnni];
+        // sort by date
+        newImgAll.sort((a, b) => {
+            return new Date(b.time) - new Date(a.time);
+        });
+        if (JSON.stringify(newImgAll) === JSON.stringify(imgAllRef.current)) {
+            return; // thoát sớm nếu không có sự thay đổi
+        }
+        imgAllRef.current = newImgAll; // lưu trữ giá trị mới nhất của imgArr
+    }, [imgWed, imgYb, imgAnni]);
+
+    function changeGallery(imgArr) {
         const temp = [];
-        for (let i = 0; i < imgSrc.length; i++) {
+        for (let i = 0; i < imgArr.length; i++) {
             const column = i % 4;
             switch (column) {
                 case 0:
-                    temp[0] = [...(temp[0] || []), imgSrc[i]];
+                    temp[0] = [...(temp[0] || []), imgArr[i]];
                     break;
                 case 1:
-                    temp[1] = [...(temp[1] || []), imgSrc[i]];
+                    temp[1] = [...(temp[1] || []), imgArr[i]];
                     break;
                 case 2:
-                    temp[2] = [...(temp[2] || []), imgSrc[i]];
+                    temp[2] = [...(temp[2] || []), imgArr[i]];
                     break;
                 case 3:
-                    temp[3] = [...(temp[3] || []), imgSrc[i]];
+                    temp[3] = [...(temp[3] || []), imgArr[i]];
                     break;
                 default:
                     break;
@@ -109,8 +124,46 @@ function Gallery() {
                 col4: temp[3] || [],
             },
         });
-    }, []);
+    }
 
+
+    useEffect(() => {
+        let filteredArr = [];
+        switch (catagory) {
+          case 'All':
+            filteredArr = imgAllRef.current;
+            break;
+          case 'Weddings':
+            filteredArr = imgWed;
+            break;
+          case 'Yearbooks':
+            filteredArr = imgYb;
+            break;
+          case 'Anniversary':
+            filteredArr = imgAnni;
+            break;
+          default:
+            break;
+        }
+        if (currentSort === 'Oldest') {
+          filteredArr.sort((a, b) => new Date(a.time) - new Date(b.time));
+        } else {
+          filteredArr.sort((a, b) => new Date(b.time) - new Date(a.time));
+        }
+        changeGallery(filteredArr);
+        setStatusSortBox(false);
+      }, [catagory, currentSort]);
+
+
+    function handleChange(e, setState) {
+        setState(e.target.textContent);
+        // add class active
+        e.target.parentElement.querySelectorAll('.active').forEach((el) => {
+            el.classList.remove('active');
+        }
+        );
+        e.target.classList.add('active');
+    }
 
     return (
         <>
@@ -129,33 +182,58 @@ function Gallery() {
                 <div className="gallery">
                     <div className="gallery__tools">
                         <div className="catagory">
-                            <div className="catagory__item active">
+                            <div
+                                className="catagory__item active"
+                                onClick={(e) => handleChange(e, setCatagory)}
+                            >
                                 All
                             </div>
-                            <div className="catagory__item">
+                            <div
+                                className="catagory__item"
+                                onClick={(e) => handleChange(e, setCatagory)}
+                            >
                                 Weddings
                             </div>
-                            <div className="catagory__item">
+                            <div
+                                className="catagory__item"
+                                onClick={(e) => handleChange(e, setCatagory)}
+                            >
                                 Yearbooks
                             </div>
-                            <div className="catagory__item">
+                            <div
+                                className="catagory__item"
+                                onClick={(e) => handleChange(e, setCatagory)}
+                            >
                                 Anniversary
                             </div>
                         </div>
                         <div className="sort-box">
-                            <div className="active">
-                                <span>Time increasing</span>
+                            <div className="current-status-sort"
+                                onClick={() => setStatusSortBox(!statusSortBox)}
+                            >
+                                <span>{currentSort}</span>
                                 <i className='fas fa-chevron-down'></i>
                             </div>
 
-                            <div className="sort-box__options">
-                                <div className="sort-box__item active">
-                                    Time increasing
-                                </div>
-                                <div className="sort-box__item">
-                                    Time decreasing
-                                </div>
-                            </div>
+                            {
+                                statusSortBox && (
+                                    <div className="sort-box__options">
+                                        <div
+                                            className="sort-box__item"
+                                            onClick={(e) => handleChange(e, setCurrentSort)}
+                                        >
+                                            Newest
+                                        </div>
+                                        <div
+                                            className="sort-box__item"
+                                            onClick={(e) => handleChange(e, setCurrentSort)}
+                                        >
+                                            Oldest
+                                        </div>
+                                    </div>
+                                )
+                            }
+
                         </div>
                     </div>
                     <div className="gallery__content">
@@ -163,12 +241,12 @@ function Gallery() {
                             {gallery.col1.map((img, index) => (
                                 <div className="gallery__column__item" key={index}>
                                     <Image
-                                        src={img}
+                                        src={img.src}
                                         alt="gallery"
                                         width={300}
                                         height={300}
                                         layout="responsive"
-
+                                        catagory={img.catagory}
                                     />
                                 </div>
                             ))}
@@ -177,12 +255,12 @@ function Gallery() {
                             {gallery.col2.map((img, index) => (
                                 <div className="gallery__column__item" key={index}>
                                     <Image
-                                        src={img}
+                                        src={img.src}
                                         alt="gallery"
                                         width={300}
                                         height={300}
                                         layout="responsive"
-
+                                        catagory={img.catagory}
                                     />
                                 </div>
                             ))}
@@ -191,12 +269,12 @@ function Gallery() {
                             {gallery.col3.map((img, index) => (
                                 <div className="gallery__column__item" key={index}>
                                     <Image
-                                        src={img}
+                                        src={img.src}
                                         alt="gallery"
                                         width={300}
                                         height={300}
                                         layout="responsive"
-
+                                        catagory={img.catagory}
                                     />
                                 </div>
                             ))}
@@ -205,12 +283,12 @@ function Gallery() {
                             {gallery.col4.map((img, index) => (
                                 <div className="gallery__column__item" key={index}>
                                     <Image
-                                        src={img}
+                                        src={img.src}
                                         alt="gallery"
                                         width={300}
                                         height={300}
                                         layout="responsive"
-
+                                        catagory={img.catagory}
                                     />
                                 </div>
                             ))}

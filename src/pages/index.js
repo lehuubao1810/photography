@@ -62,7 +62,7 @@ export default function Home() {
       </Head>
       <Header />
       <main>
-        <IntroImg src = "/img/wed.jpg" />
+        <IntroImg src = "/img/wed_intro.jpg" />
         <div className='intro-para'>
           <h1>Your wedding day is the biggest day in your life</h1>
           <p>

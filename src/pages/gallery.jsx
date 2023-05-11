@@ -273,7 +273,7 @@ function Gallery() {
             </Head>
 
             <Header />
-            <IntroImg src="/img/yb.jpg" />
+            <IntroImg src="/img/yb/yb.webp" />
 
             {
                 statusModal

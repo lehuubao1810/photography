@@ -1,15 +1,29 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 // import { useEffect } from 'react'
 
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import styles from '@/styles/Home.module.css'
 import IntroImg from '@/components/IntroImg'
+import ModalImg from '@/components/ModalImg'
 
 export default function Home() {
+
+  // Modal
+  const [statusModal, setStatusModal] = useState(false);
+  const [attrModal, setAttrModal] = useState({});
+
+  function openModal(e) {
+    setStatusModal(true);
+    setAttrModal({
+      src: e.target.src,
+      alt: e.target.alt,
+    });
+  }
+  // End Modal
 
   const galleryItemRef = useRef(null)
 
@@ -61,8 +75,17 @@ export default function Home() {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
       </Head>
       <Header />
+
+      {
+        statusModal &&
+        <ModalImg
+          src={attrModal.src}
+          alt={attrModal.alt}
+          setStatusModal={setStatusModal}
+        />
+      }
       <main>
-        <IntroImg src = "/img/wed_intro.jpg" />
+        <IntroImg src="/img/wed_intro.jpg" />
         <div className='intro-para'>
           <h1>Your wedding day is the biggest day in your life</h1>
           <p>
@@ -75,13 +98,20 @@ export default function Home() {
           <Link href='/contact' className='btn-contact'>
             Contact
           </Link>
+          <Link href='/gallery'>
+            View All
+          </Link>
         </div>
         <div className='gallery'>
           <div ref={galleryItemRef} className='gallery__items'>
             <div className='gallery__item item-left'>
               <h1 className='gallery__item__title'>Anniversary</h1>
               <div className='line'></div>
-              <div className='btn-viewAll'>View All</div>
+              <div className='btn-viewAll'>
+                <Link href='/gallery'>
+                  View All
+                </Link>
+              </div>
               <div className='gallery__item__img'>
                 <Image
                   src='/img/anni.jpg'
@@ -97,7 +127,11 @@ export default function Home() {
             <div className='gallery__item item-center'>
               <h1 className='gallery__item__title'>Weddings</h1>
               <div className='line'></div>
-              <div className='btn-viewAll'>View All</div>
+              <div className='btn-viewAll'>
+                <Link href='/gallery'>
+                  View All
+                </Link>
+              </div>
               <div className='gallery__item__img'>
                 <Image
                   src='/img/wed.jpg'
@@ -113,7 +147,11 @@ export default function Home() {
             <div className='gallery__item item-right'>
               <h1 className='gallery__item__title'>Yearbook</h1>
               <div className='line'></div>
-              <div className='btn-viewAll'>View All</div>
+              <div className='btn-viewAll'>
+                <Link href='/gallery'>
+                  View All
+                </Link>
+              </div>
               <div className='gallery__item__img'>
                 <Image
                   src='/img/yb.jpg'
@@ -160,6 +198,7 @@ export default function Home() {
               layout="responsive"
               // placeholder="blur"
               priority={true}
+              onClick={(e) => openModal(e)}
             />
           </div>
         </div>
@@ -175,6 +214,7 @@ export default function Home() {
                   layout="responsive"
                   // placeholder="blur"
                   priority={true}
+                  onClick={(e) => openModal(e)}
                 />
               </div>
               <div className='reviews__item__para'>

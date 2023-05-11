@@ -5,6 +5,7 @@ import { useEffect, useReducer, useState, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import IntroImg from '@/components/IntroImg';
+import ModalImg from '@/components/ModalImg';
 
 
 const initialState = {
@@ -60,7 +61,7 @@ const imgSrc = {
             catagory: 'anniversary',
             time: '2021-09-03'
         },
-        
+
     ],
 }
 
@@ -70,6 +71,11 @@ function Gallery() {
     const [imgYb, setImgYb] = useState(imgSrc.yearbook);
     const [imgAnni, setImgAnni] = useState(imgSrc.anniversary);
     const [catagory, setCatagory] = useState('All');
+
+    // Modal
+    const [statusModal, setStatusModal] = useState(false);
+    const [attrModal, setAttrModal] = useState({});
+
 
     const [statusSortBox, setStatusSortBox] = useState(false);
     const [currentSort, setCurrentSort] = useState('Newest');
@@ -130,29 +136,29 @@ function Gallery() {
     useEffect(() => {
         let filteredArr = [];
         switch (catagory) {
-          case 'All':
-            filteredArr = imgAllRef.current;
-            break;
-          case 'Weddings':
-            filteredArr = imgWed;
-            break;
-          case 'Yearbooks':
-            filteredArr = imgYb;
-            break;
-          case 'Anniversary':
-            filteredArr = imgAnni;
-            break;
-          default:
-            break;
+            case 'All':
+                filteredArr = imgAllRef.current;
+                break;
+            case 'Weddings':
+                filteredArr = imgWed;
+                break;
+            case 'Yearbooks':
+                filteredArr = imgYb;
+                break;
+            case 'Anniversary':
+                filteredArr = imgAnni;
+                break;
+            default:
+                break;
         }
         if (currentSort === 'Oldest') {
-          filteredArr.sort((a, b) => new Date(a.time) - new Date(b.time));
+            filteredArr.sort((a, b) => new Date(a.time) - new Date(b.time));
         } else {
-          filteredArr.sort((a, b) => new Date(b.time) - new Date(a.time));
+            filteredArr.sort((a, b) => new Date(b.time) - new Date(a.time));
         }
         changeGallery(filteredArr);
         setStatusSortBox(false);
-      }, [catagory, currentSort]);
+    }, [catagory, currentSort]);
 
 
     function handleChange(e, setState) {
@@ -163,6 +169,14 @@ function Gallery() {
         }
         );
         e.target.classList.add('active');
+    }
+
+    function openModal(e) {
+        setStatusModal(true);
+        setAttrModal({
+            src: e.target.src,
+            alt: e.target.alt,
+        });
     }
 
     return (
@@ -177,6 +191,17 @@ function Gallery() {
 
             <Header />
             <IntroImg src="/img/yb.jpg" />
+
+            {
+                statusModal
+                &&
+                <ModalImg
+                    src={attrModal.src}
+                    alt={attrModal.alt}
+                    setStatusModal={setStatusModal}
+                />
+            }
+
 
             <main>
                 <div className="gallery">
@@ -247,6 +272,7 @@ function Gallery() {
                                         height={300}
                                         layout="responsive"
                                         catagory={img.catagory}
+                                        onClick={e => openModal(e)}
                                     />
                                 </div>
                             ))}
@@ -261,6 +287,7 @@ function Gallery() {
                                         height={300}
                                         layout="responsive"
                                         catagory={img.catagory}
+                                        onClick={e => openModal(e)}
                                     />
                                 </div>
                             ))}
@@ -275,6 +302,7 @@ function Gallery() {
                                         height={300}
                                         layout="responsive"
                                         catagory={img.catagory}
+                                        onClick={e => openModal(e)}
                                     />
                                 </div>
                             ))}
@@ -289,6 +317,7 @@ function Gallery() {
                                         height={300}
                                         layout="responsive"
                                         catagory={img.catagory}
+                                        onClick={e => openModal(e)}
                                     />
                                 </div>
                             ))}

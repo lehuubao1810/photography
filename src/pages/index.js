@@ -111,7 +111,7 @@ export default function Home() {
               </div>
               <div className='gallery__item__img'>
                 <Image
-                  src='/img/anni.jpg'
+                  src='/img/anni/anni.webp'
                   alt='Anniversary'
                   width={500}
                   height={500}
@@ -131,7 +131,7 @@ export default function Home() {
               </div>
               <div className='gallery__item__img'>
                 <Image
-                  src='/img/wed.jpg'
+                  src='/img/wed/wed.webp'
                   alt='Wedding'
                   width={500}
                   height={500}
@@ -151,7 +151,7 @@ export default function Home() {
               </div>
               <div className='gallery__item__img'>
                 <Image
-                  src='/img/yb.jpg'
+                  src='/img/yb/yb.webp'
                   alt='Yearbook'
                   width={500}
                   height={500}
@@ -204,7 +204,7 @@ export default function Home() {
             <div className='reviews__item'>
               <div className='reviews__item__img'>
                 <Image
-                  src='/img/wed.jpg'
+                  src='/img/wed/wed.webp'
                   alt='About'
                   width={500}
                   height={500}

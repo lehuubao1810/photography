@@ -98,9 +98,6 @@ export default function Home() {
           <Link href='/contact' className='btn-contact'>
             Contact
           </Link>
-          <Link href='/gallery'>
-            View All
-          </Link>
         </div>
         <div className='gallery'>
           <div ref={galleryItemRef} className='gallery__items'>
@@ -108,7 +105,7 @@ export default function Home() {
               <h1 className='gallery__item__title'>Anniversary</h1>
               <div className='line'></div>
               <div className='btn-viewAll'>
-                <Link href='/gallery'>
+                <Link href={{ pathname: '/gallery', query: { categoryRequire: 'Anniversary' } }}>
                   View All
                 </Link>
               </div>
@@ -128,7 +125,7 @@ export default function Home() {
               <h1 className='gallery__item__title'>Weddings</h1>
               <div className='line'></div>
               <div className='btn-viewAll'>
-                <Link href='/gallery'>
+                <Link href={{ pathname: '/gallery', query: { categoryRequire: 'Weddings' } }}>
                   View All
                 </Link>
               </div>
@@ -148,7 +145,7 @@ export default function Home() {
               <h1 className='gallery__item__title'>Yearbook</h1>
               <div className='line'></div>
               <div className='btn-viewAll'>
-                <Link href='/gallery'>
+                <Link href={{ pathname: '/gallery', query: { categoryRequire: 'Yearbooks' } }}>
                   View All
                 </Link>
               </div>

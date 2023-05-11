@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { useEffect, useReducer, useState, useRef } from 'react';
 
 import Header from '@/components/Header';
@@ -43,34 +44,98 @@ const reducer = (state, action) => {
 const imgSrc = {
     wedding: [
         {
-            src: '/img/wed.jpg',
-            catagory: 'wedding',
+            src: '/img/wed/wed.webp',
+            category: 'wedding',
             time: '2021-09-02'
         },
+        {
+            src: '/img/wed/wed2.webp',
+            category: 'wedding',
+            time: '2021-09-15'
+        },
+        {
+            src: '/img/wed/wed3.webp',
+            category: 'wedding',
+            time: '2021-09-12'
+        },
+        {
+            src: '/img/wed/wed4.webp',
+            category: 'wedding',
+            time: '2021-09-04'
+        },
+        {
+            src: '/img/wed/wed5.webp',
+            category: 'wedding',
+            time: '2021-09-02'
+        }
     ],
     yearbook: [
         {
-            src: '/img/yb.jpg',
-            catagory: 'yearbook',
+            src: '/img/yb/yb.webp',
+            category: 'yearbook',
             time: '2021-09-01'
         },
+        {
+            src: '/img/yb/yb2.webp',
+            category: 'yearbook',
+            time: '2021-09-09'
+        },
+        {
+            src: '/img/yb/yb3.webp',
+            category: 'yearbook',
+            time: '2021-09-09'
+        },
+        {
+            src: '/img/yb/yb4.webp',
+            category: 'yearbook',
+            time: '2021-09-06'
+        },
+        {
+            src: '/img/yb/yb5.webp',
+            category: 'yearbook',
+            time: '2021-09-08'
+        }
     ],
     anniversary: [
         {
-            src: '/img/anni.jpg',
-            catagory: 'anniversary',
+            src: '/img/anni/anni.webp',
+            category: 'anniversary',
             time: '2021-09-03'
         },
-
+        {
+            src: '/img/anni/anni2.webp',
+            category: 'anniversary',
+            time: '2021-09-12'
+        },
+        {
+            src: '/img/anni/anni3.webp',
+            category: 'anniversary',
+            time: '2021-09-23'
+        },
+        {
+            src: '/img/anni/anni4.webp',
+            category: 'anniversary',
+            time: '2021-09-05'
+        },
+        {
+            src: '/img/anni/anni5.webp',
+            category: 'anniversary',
+            time: '2021-09-07'
+        }
     ],
 }
 
 function Gallery() {
 
+    const router = useRouter();
+    const { categoryRequire } = router.query; 
+    console.log(categoryRequire);  
+    // transform json to array
+
     const [imgWed, setImgWed] = useState(imgSrc.wedding);
     const [imgYb, setImgYb] = useState(imgSrc.yearbook);
     const [imgAnni, setImgAnni] = useState(imgSrc.anniversary);
-    const [catagory, setCatagory] = useState('All');
+    const [category, setCategory] = useState(categoryRequire || 'All');
 
     // Modal
     const [statusModal, setStatusModal] = useState(false);
@@ -87,6 +152,7 @@ function Gallery() {
     // const imgYbRef = useRef(imgSrc.yearbook);
     // const imgAnniRef = useRef(imgSrc.anniversary);
     const imgAllRef = useRef([]);
+    const categoryRef = useRef(null);
 
     useEffect(() => {
         const newImgAll = [...imgWed, ...imgYb, ...imgAnni];
@@ -135,7 +201,7 @@ function Gallery() {
 
     useEffect(() => {
         let filteredArr = [];
-        switch (catagory) {
+        switch (category) {
             case 'All':
                 filteredArr = imgAllRef.current;
                 break;
@@ -158,8 +224,25 @@ function Gallery() {
         }
         changeGallery(filteredArr);
         setStatusSortBox(false);
-    }, [catagory, currentSort]);
+    }, [category, currentSort]);
 
+    useEffect(() => {
+        if (categoryRequire && categoryRef.current) {
+            setCategory(categoryRequire);
+            const categoryItems = categoryRef.current.querySelectorAll('.category__item');
+            console.log(categoryRef);
+            categoryItems.forEach((el) => {
+                // remove class active
+                el.classList.remove('active');
+            });
+            // add class active
+            categoryItems.forEach((el) => {
+                if (el.textContent === categoryRequire) {
+                    el.classList.add('active');
+                }
+            })
+        }
+    }, [categoryRequire]);
 
     function handleChange(e, setState) {
         setState(e.target.textContent);
@@ -206,28 +289,28 @@ function Gallery() {
             <main>
                 <div className="gallery">
                     <div className="gallery__tools">
-                        <div className="catagory">
+                        <div className="category" ref={categoryRef}>
                             <div
-                                className="catagory__item active"
-                                onClick={(e) => handleChange(e, setCatagory)}
+                                className="category__item active"
+                                onClick={(e) => handleChange(e, setCategory)}
                             >
                                 All
                             </div>
                             <div
-                                className="catagory__item"
-                                onClick={(e) => handleChange(e, setCatagory)}
+                                className="category__item"
+                                onClick={(e) => handleChange(e, setCategory)}
                             >
                                 Weddings
                             </div>
                             <div
-                                className="catagory__item"
-                                onClick={(e) => handleChange(e, setCatagory)}
+                                className="category__item"
+                                onClick={(e) => handleChange(e, setCategory)}
                             >
                                 Yearbooks
                             </div>
                             <div
-                                className="catagory__item"
-                                onClick={(e) => handleChange(e, setCatagory)}
+                                className="category__item"
+                                onClick={(e) => handleChange(e, setCategory)}
                             >
                                 Anniversary
                             </div>
@@ -271,7 +354,7 @@ function Gallery() {
                                         width={300}
                                         height={300}
                                         layout="responsive"
-                                        catagory={img.catagory}
+                                        category={img.category}
                                         onClick={e => openModal(e)}
                                     />
                                 </div>
@@ -286,7 +369,7 @@ function Gallery() {
                                         width={300}
                                         height={300}
                                         layout="responsive"
-                                        catagory={img.catagory}
+                                        category={img.category}
                                         onClick={e => openModal(e)}
                                     />
                                 </div>
@@ -301,7 +384,7 @@ function Gallery() {
                                         width={300}
                                         height={300}
                                         layout="responsive"
-                                        catagory={img.catagory}
+                                        category={img.category}
                                         onClick={e => openModal(e)}
                                     />
                                 </div>
@@ -316,7 +399,7 @@ function Gallery() {
                                         width={300}
                                         height={300}
                                         layout="responsive"
-                                        catagory={img.catagory}
+                                        category={img.category}
                                         onClick={e => openModal(e)}
                                     />
                                 </div>

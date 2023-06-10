@@ -1,12 +1,15 @@
+"use client"
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useReducer, useState, useRef } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import IntroImg from '@/components/IntroImg';
 import ModalImg from '@/components/ModalImg';
+import { db } from './data/firebase';
 
 
 const initialState = {
@@ -30,111 +33,47 @@ const reducer = (state, action) => {
             return state;
     }
 }
-// const imgSrc = [
-//     '/img/anni.jpg',
-//     '/img/wed.jpg',
-//     '/img/yb.jpg',
-//     '/img/anni.jpg',
-//     '/img/wed.jpg',
-//     '/img/avt.jpg',
-//     '/img/avt.jpg',
-//     '/img/yb.jpg',
-// ]
-
-const imgSrc = {
-    wedding: [
-        {
-            src: '/img/wed/wed.webp',
-            category: 'wedding',
-            time: '2021-09-02'
-        },
-        {
-            src: '/img/wed/wed2.webp',
-            category: 'wedding',
-            time: '2021-09-15'
-        },
-        {
-            src: '/img/wed/wed3.webp',
-            category: 'wedding',
-            time: '2021-09-12'
-        },
-        {
-            src: '/img/wed/wed4.webp',
-            category: 'wedding',
-            time: '2021-09-04'
-        },
-        {
-            src: '/img/wed/wed5.webp',
-            category: 'wedding',
-            time: '2021-09-02'
-        }
-    ],
-    yearbook: [
-        {
-            src: '/img/yb/yb.webp',
-            category: 'yearbook',
-            time: '2021-09-01'
-        },
-        {
-            src: '/img/yb/yb2.webp',
-            category: 'yearbook',
-            time: '2021-09-09'
-        },
-        {
-            src: '/img/yb/yb3.webp',
-            category: 'yearbook',
-            time: '2021-09-09'
-        },
-        {
-            src: '/img/yb/yb4.webp',
-            category: 'yearbook',
-            time: '2021-09-06'
-        },
-        {
-            src: '/img/yb/yb5.webp',
-            category: 'yearbook',
-            time: '2021-09-08'
-        }
-    ],
-    anniversary: [
-        {
-            src: '/img/anni/anni.webp',
-            category: 'anniversary',
-            time: '2021-09-03'
-        },
-        {
-            src: '/img/anni/anni2.webp',
-            category: 'anniversary',
-            time: '2021-09-12'
-        },
-        {
-            src: '/img/anni/anni3.webp',
-            category: 'anniversary',
-            time: '2021-09-23'
-        },
-        {
-            src: '/img/anni/anni4.webp',
-            category: 'anniversary',
-            time: '2021-09-05'
-        },
-        {
-            src: '/img/anni/anni5.webp',
-            category: 'anniversary',
-            time: '2021-09-07'
-        }
-    ],
-}
 
 function Gallery() {
 
     const router = useRouter();
     const { categoryRequire } = router.query; 
-    console.log(categoryRequire);  
     // transform json to array
 
-    const [imgWed, setImgWed] = useState(imgSrc.wedding);
-    const [imgYb, setImgYb] = useState(imgSrc.yearbook);
-    const [imgAnni, setImgAnni] = useState(imgSrc.anniversary);
+    const [imgWed, setImgWed] = useState([]);
+    const [imgYb, setImgYb] = useState([]);
+    const [imgAnni, setImgAnni] = useState([]);
+  
+    useEffect(() => {
+      const fetchData = () => {
+        try {
+          getData('wedding', setImgWed);
+          getData('yearbook', setImgYb);
+          getData('anniversary', setImgAnni);
+        } catch (error) {
+          console.error('Lỗi khi lấy dữ liệu:', error);
+        }
+      };
+  
+      fetchData();
+    }, []);
+    async function getData(category, setCategory) {
+      const docRef = doc(db, "images", category);
+      const querySnapshot = await getDoc(docRef);
+      // Trích xuất dữ liệu từ Firestore và cập nhật state
+      if (querySnapshot.exists()) {
+        const data = querySnapshot.data().img;
+        if (data) {
+          setCategory(data);
+        } else {
+          setCategory([]);
+        }
+  
+      } else {
+        console.log("No such document!");
+      }
+    }
+
     const [category, setCategory] = useState(categoryRequire || 'All');
 
     // Modal
@@ -147,10 +86,6 @@ function Gallery() {
 
     const [gallery, dispatch] = useReducer(reducer, initialState);
 
-    // const [imgArr, setImgArr] = useState([]);
-    // const imgWedRef = useRef(imgSrc.wedding);
-    // const imgYbRef = useRef(imgSrc.yearbook);
-    // const imgAnniRef = useRef(imgSrc.anniversary);
     const imgAllRef = useRef([]);
     const categoryRef = useRef(null);
 
@@ -164,6 +99,7 @@ function Gallery() {
             return; // thoát sớm nếu không có sự thay đổi
         }
         imgAllRef.current = newImgAll; // lưu trữ giá trị mới nhất của imgArr
+        changeGallery(newImgAll);
     }, [imgWed, imgYb, imgAnni]);
 
     function changeGallery(imgArr) {
@@ -230,7 +166,6 @@ function Gallery() {
         if (categoryRequire && categoryRef.current) {
             setCategory(categoryRequire);
             const categoryItems = categoryRef.current.querySelectorAll('.category__item');
-            console.log(categoryRef);
             categoryItems.forEach((el) => {
                 // remove class active
                 el.classList.remove('active');
